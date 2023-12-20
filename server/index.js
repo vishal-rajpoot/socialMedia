@@ -13,6 +13,7 @@ const connection = async db => {
     app.listen( port, () => {
         console.log(`server started listening at ${port}`);
         // logger.info(`server started listening at ${port}`)
+        
     })
 }
 connection();
