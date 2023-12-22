@@ -26,4 +26,4 @@ const connection = async db => {
 connection();
 
 app.use('/auth', authRoute);
-app.use('/user', userRoute);
+app.use('/user', userRoute); 
