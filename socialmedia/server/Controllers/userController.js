@@ -43,11 +43,62 @@ const deleteUser = async (req, res) => {
     if(currentUserId === id || currenUserAdminStatus){
         try {
             await userModel.findByIdAndDelete(id);
-            res.status(200).json("User Deleted ")
+            res.status(200).json("User Deleted Successfully ")
+        } catch (error) {
+            res.status(500).json(error);  
+        }
+    } else {
+        res.status(403).json("Access Denied !!!");
+    }
+}
+// follow a  user
+
+const followUser = async (req, res) => {
+    const id = req.params.id;
+
+    const { currentUserId } = req.body;
+    if( currentUserId === id){
+        res.status(403).json("Action forbidden")
+    } else {
+        try {
+            const followUser = await userModel.findById(id);
+            const followingUser = await userModel.findById(currentUserId);
+
+            if(!followUser.followers.includes(currentUserId)){
+                await followUser.updateOne({$push: { followers: currentUserId}})
+                await followingUser.updateOne({$push: { following: id}})
+                res.status(200).json("user followed");
+            } else {
+                res.status(403).json("User is already followed by you");
+            }
         } catch (error) {
             res.status(500).json(error);  
         }
     }
-}
+} 
 
-export { getUser, updateUser, deleteUser };
+const UnFollowUser = async (req, res) => {
+    const id = req.params.id;
+
+    const { currentUserId } = req.body;
+    if( currentUserId === id){
+        res.status(403).json("Action forbidden")
+    } else {
+        try {
+            const followUser = await userModel.findById(id);
+            const followingUser = await userModel.findById(currentUserId);
+
+            if(!followUser.followers.includes(currentUserId)){
+                await followUser.updateOne({$pull: { followers: currentUserId}})
+                await followingUser.updateOne({$pull: { following: id}})
+                res.status(200).json("user UnFollowed");
+            } else {
+                res.status(403).json("User is not followed by you");
+            }
+        } catch (error) {
+            res.status(500).json(error);  
+        }
+    }
+} 
+
+export { getUser, updateUser, deleteUser, followUser, UnFollowUser };
